@@ -24,6 +24,8 @@ namespace HookShare
 
 	enum Hook : UInt32
 	{
+		kHook_FirstPersonState,
+		kHook_ThirdPersonState,
 		kHook_Favorites,
 		kHook_Movement,
 		kHook_Look,
@@ -36,12 +38,13 @@ namespace HookShare
 		kHook_Shout,
 		kHook_AttackBlock,
 		kHook_Run,
-		kHook_Sneak,
-		kHook_TogglePOV
+		kHook_Sneak
 	};
 
 
 	typedef ReturnType _PlayerInputHandler_CanProcess_t(RE::PlayerInputHandler* a_this, InputEvent* a_event);
+	extern std::vector<_PlayerInputHandler_CanProcess_t*> firstPersonStateRegs;
+	extern std::vector<_PlayerInputHandler_CanProcess_t*> thirdPersonStateRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> favoritesRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> movementRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> lookRegs;
@@ -55,7 +58,6 @@ namespace HookShare
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> attackBlockRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> runRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> sneakRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> togglePOVRegs;
 
 
 	typedef void _RegisterHook_t(_PlayerInputHandler_CanProcess_t* a_func, Hook a_hookType);

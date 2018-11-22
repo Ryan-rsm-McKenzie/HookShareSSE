@@ -3,6 +3,8 @@
 
 namespace HookShare
 {
+	std::vector<_PlayerInputHandler_CanProcess_t*> firstPersonStateRegs;
+	std::vector<_PlayerInputHandler_CanProcess_t*> thirdPersonStateRegs;
 	std::vector<_PlayerInputHandler_CanProcess_t*> favoritesRegs;
 	std::vector<_PlayerInputHandler_CanProcess_t*> movementRegs;
 	std::vector<_PlayerInputHandler_CanProcess_t*> lookRegs;
@@ -16,12 +18,17 @@ namespace HookShare
 	std::vector<_PlayerInputHandler_CanProcess_t*> attackBlockRegs;
 	std::vector<_PlayerInputHandler_CanProcess_t*> runRegs;
 	std::vector<_PlayerInputHandler_CanProcess_t*> sneakRegs;
-	std::vector<_PlayerInputHandler_CanProcess_t*> togglePOVRegs;
 
 
 	void RegisterHook(_PlayerInputHandler_CanProcess_t* a_func, Hook a_hookType)
 	{
 		switch (a_hookType) {
+		case kHook_FirstPersonState:
+			firstPersonStateRegs.push_back(a_func);
+			break;
+		case kHook_ThirdPersonState:
+			thirdPersonStateRegs.push_back(a_func);
+			break;
 		case kHook_Favorites:
 			favoritesRegs.push_back(a_func);
 			break;
@@ -60,9 +67,6 @@ namespace HookShare
 			break;
 		case kHook_Sneak:
 			sneakRegs.push_back(a_func);
-			break;
-		case kHook_TogglePOV:
-			togglePOVRegs.push_back(a_func);
 			break;
 		}
 	}
