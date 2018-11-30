@@ -2,14 +2,14 @@
 
 #include <vector>  // vector
 
-
-class InputEvent;
-
-
 namespace RE
 {
+	class InputEvent;
 	class PlayerInputHandler;
 }
+
+
+#define HOOK_SHARE_API_VERSION_MAJOR	1
 
 
 namespace HookShare
@@ -42,7 +42,7 @@ namespace HookShare
 	};
 
 
-	typedef ReturnType _PlayerInputHandler_CanProcess_t(RE::PlayerInputHandler* a_this, InputEvent* a_event);
+	typedef ReturnType _PlayerInputHandler_CanProcess_t(RE::PlayerInputHandler* a_this, RE::InputEvent* a_event);
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> firstPersonStateRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> thirdPersonStateRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> favoritesRegs;

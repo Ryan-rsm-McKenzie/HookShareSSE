@@ -20,7 +20,7 @@ void MessageHandler(SKSEMessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
 	case SKSEMessagingInterface::kMessage_DataLoaded:
-		g_messaging->Dispatch(g_pluginHandle, 0, HookShare::RegisterHook, 0, 0);
+		g_messaging->Dispatch(g_pluginHandle, HOOK_SHARE_API_VERSION_MAJOR, HookShare::RegisterHook, 0, 0);
 		break;
 	}
 }
@@ -37,7 +37,7 @@ extern "C" {
 
 		a_info->infoVersion = PluginInfo::kInfoVersion;
 		a_info->name = "HookShareSSE";
-		a_info->version = 1;
+		a_info->version = HOOK_SHARE_API_VERSION_MAJOR;
 
 		g_pluginHandle = a_skse->GetPluginHandle();
 
