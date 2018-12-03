@@ -24,10 +24,11 @@ namespace Hooks
 		{
 			using HookShare::ReturnType;
 
-			if (a_event) {
+			bool result = (this->*orig_CanProcess)(a_event);
+
+			if (a_event && !regs.empty()) {
 				UInt32 retFalse = 0;
 				UInt32 retTrue = 0;
-				UInt32 retContinue = 0;
 				for (auto& reg : regs) {
 					ReturnType ret = reg(this, a_event);
 					switch (ret) {
@@ -38,7 +39,7 @@ namespace Hooks
 						++retTrue;
 						break;
 					case ReturnType::kReturnType_Continue:
-						++retContinue;
+					default:
 						break;
 					}
 				}
@@ -48,10 +49,11 @@ namespace Hooks
 				} else if (retTrue) {
 					return true;
 				} else {
-					return (this->*orig_CanProcess)(a_event);
+					return result;
 				}
 			}
-			return (this->*orig_CanProcess)(a_event);
+
+			return result;
 		}
 
 

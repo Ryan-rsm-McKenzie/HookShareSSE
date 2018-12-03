@@ -10,6 +10,7 @@
 
 #include "Hooks.h"  // InstallHooks()
 #include "HookShare.h"  // RegisterHook()
+#include "version.h"
 
 
 static PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
@@ -33,7 +34,7 @@ extern "C" {
 		gLog.SetPrintLevel(IDebugLog::kLevel_DebugMessage);
 		gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
-		_MESSAGE("HookShareSSE");
+		_MESSAGE("HookShareSSE v%s", HOOKSHARESSE_VERSION_VERSTRING);
 
 		a_info->infoVersion = PluginInfo::kInfoVersion;
 		a_info->name = "HookShareSSE";
@@ -44,7 +45,9 @@ extern "C" {
 		if (a_skse->isEditor) {
 			_FATALERROR("[FATAL ERROR] Loaded in editor, marking as incompatible!\n");
 			return false;
-		} else if (a_skse->runtimeVersion != RUNTIME_VERSION_1_5_53) {
+		}
+
+		if (a_skse->runtimeVersion != RUNTIME_VERSION_1_5_53) {
 			_FATALERROR("[FATAL ERROR] Unsupported runtime version %08X!\n", a_skse->runtimeVersion);
 			return false;
 		}
@@ -61,7 +64,7 @@ extern "C" {
 		if (g_messaging->RegisterListener(g_pluginHandle, "SKSE", MessageHandler)) {
 			_MESSAGE("[MESSAGE] Messaging interface registration successful");
 		} else {
-			_FATALERROR("[FATAL ERROR] Messaging interface registration failed!");
+			_FATALERROR("[FATAL ERROR] Messaging interface registration failed!\n");
 			return false;
 		}
 

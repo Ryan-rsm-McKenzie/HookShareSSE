@@ -26,8 +26,10 @@
     <ClInclude Include="include\Hooks.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="version.h" />
     <ClInclude Include="include\HookShare.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\version.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
