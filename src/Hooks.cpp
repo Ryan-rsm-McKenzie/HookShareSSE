@@ -67,21 +67,21 @@ namespace Hooks
 
 
 	template <uintptr_t offset, std::vector<HookShare::_PlayerInputHandler_CanProcess_t*>& regs> typename PlayerInputHandler<offset, regs>::_CanProcess_t PlayerInputHandler<offset, regs>::orig_CanProcess;
-	typedef PlayerInputHandler<RE::FIRST_PERSON_STATE_VTBL_META + 0x60, HookShare::firstPersonStateRegs>	FirstPersonStateHandlerEx;
-	typedef PlayerInputHandler<RE::THIRD_PERSON_STATE_VTBL_META + 0x98, HookShare::thirdPersonStateRegs>	ThirdPersonStateHandlerEx;
-	typedef PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL_META + 0x10, HookShare::favoritesRegs>			FavoritesHandlerEx;
-	typedef PlayerInputHandler<RE::MOVEMENT_HANDLER_VTBL_META + 0x10, HookShare::movementRegs>				MovementHandlerEx;
-	typedef PlayerInputHandler<RE::LOOK_HANDLER_VTBL_META + 0x10, HookShare::lookRegs>						LookHandlerEx;
-	typedef PlayerInputHandler<RE::SPRINT_HANDLER_VTBL_META + 0x10, HookShare::sprintRegs>					SprintHandlerEx;
-	typedef PlayerInputHandler<RE::READY_WEAPON_HANDLER_VTBL_META + 0x10, HookShare::readyWeaponRegs>		ReadyWeaponHandlerEx;
-	typedef PlayerInputHandler<RE::AUTO_MOVE_HANDLER_VTBL_META + 0x10, HookShare::autoMoveRegs>				AutoMoveHandlerEx;
-	typedef PlayerInputHandler<RE::TOGGLE_RUN_HANDLER_VTBL_META + 0x10, HookShare::toggleRunRegs>			ToggleRunHandlerEx;
-	typedef PlayerInputHandler<RE::ACTIVATE_HANDLER_VTBL_META + 0x10, HookShare::activateRegs>				ActivateHandlerEx;
-	typedef PlayerInputHandler<RE::JUMP_HANDLER_VTBL_META + 0x10, HookShare::jumpRegs>						JumpHandlerEx;
-	typedef PlayerInputHandler<RE::SHOUT_HANDLER_VTBL_META + 0x10, HookShare::shoutRegs>					ShoutHandlerEx;
-	typedef PlayerInputHandler<RE::ATTACK_BLOCK_HANDLER_VTBL_META + 0x10, HookShare::attackBlockRegs>		AttackBlockHandlerEx;
-	typedef PlayerInputHandler<RE::RUN_HANDLER_VTBL_META + 0x10, HookShare::runRegs>						RunHandlerEx;
-	typedef PlayerInputHandler<RE::SNEAK_HANDLER_VTBL_META + 0x10, HookShare::sneakRegs>					SneakHandlerEx;
+	typedef PlayerInputHandler<RE::FIRST_PERSON_STATE_VTBL + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>	FirstPersonStateHandlerEx;
+	typedef PlayerInputHandler<RE::THIRD_PERSON_STATE_VTBL + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>	ThirdPersonStateHandlerEx;
+	typedef PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL + 0x10, HookShare::favoritesRegs>										FavoritesHandlerEx;
+	typedef PlayerInputHandler<RE::MOVEMENT_HANDLER_VTBL + (0x1 * 0x8), HookShare::movementRegs>								MovementHandlerEx;
+	typedef PlayerInputHandler<RE::LOOK_HANDLER_VTBL + (0x1 * 0x8), HookShare::lookRegs>										LookHandlerEx;
+	typedef PlayerInputHandler<RE::SPRINT_HANDLER_VTBL + (0x1 * 0x8), HookShare::sprintRegs>									SprintHandlerEx;
+	typedef PlayerInputHandler<RE::READY_WEAPON_HANDLER_VTBL + (0x1 * 0x8), HookShare::readyWeaponRegs>							ReadyWeaponHandlerEx;
+	typedef PlayerInputHandler<RE::AUTO_MOVE_HANDLER_VTBL + (0x1 * 0x8), HookShare::autoMoveRegs>								AutoMoveHandlerEx;
+	typedef PlayerInputHandler<RE::TOGGLE_RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::toggleRunRegs>								ToggleRunHandlerEx;
+	typedef PlayerInputHandler<RE::ACTIVATE_HANDLER_VTBL + (0x1 * 0x8), HookShare::activateRegs>								ActivateHandlerEx;
+	typedef PlayerInputHandler<RE::JUMP_HANDLER_VTBL + (0x1 * 0x8), HookShare::jumpRegs>										JumpHandlerEx;
+	typedef PlayerInputHandler<RE::SHOUT_HANDLER_VTBL + (0x1 * 0x8), HookShare::shoutRegs>										ShoutHandlerEx;
+	typedef PlayerInputHandler<RE::ATTACK_BLOCK_HANDLER_VTBL + (0x1 * 0x8), HookShare::attackBlockRegs>							AttackBlockHandlerEx;
+	typedef PlayerInputHandler<RE::RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::runRegs>											RunHandlerEx;
+	typedef PlayerInputHandler<RE::SNEAK_HANDLER_VTBL + (0x1 * 0x8), HookShare::sneakRegs>										SneakHandlerEx;
 
 
 	void InstallHooks()
