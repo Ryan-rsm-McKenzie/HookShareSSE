@@ -69,7 +69,7 @@ namespace Hooks
 	template <uintptr_t offset, std::vector<HookShare::_PlayerInputHandler_CanProcess_t*>& regs> typename PlayerInputHandler<offset, regs>::_CanProcess_t PlayerInputHandler<offset, regs>::orig_CanProcess;
 	typedef PlayerInputHandler<RE::FIRST_PERSON_STATE_VTBL + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>	FirstPersonStateHandlerEx;
 	typedef PlayerInputHandler<RE::THIRD_PERSON_STATE_VTBL + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>	ThirdPersonStateHandlerEx;
-	typedef PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL + 0x10, HookShare::favoritesRegs>										FavoritesHandlerEx;
+	typedef PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL + (0x1 * 0x8), HookShare::favoritesRegs>								FavoritesHandlerEx;
 	typedef PlayerInputHandler<RE::MOVEMENT_HANDLER_VTBL + (0x1 * 0x8), HookShare::movementRegs>								MovementHandlerEx;
 	typedef PlayerInputHandler<RE::LOOK_HANDLER_VTBL + (0x1 * 0x8), HookShare::lookRegs>										LookHandlerEx;
 	typedef PlayerInputHandler<RE::SPRINT_HANDLER_VTBL + (0x1 * 0x8), HookShare::sprintRegs>									SprintHandlerEx;
