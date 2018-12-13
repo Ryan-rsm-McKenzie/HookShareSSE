@@ -14,31 +14,31 @@ namespace RE
 
 namespace HookShare
 {
-	enum ReturnType : UInt32
+	enum class ReturnType : UInt32
 	{
-		kReturnType_False,
-		kReturnType_True,
-		kReturnType_Continue
+		kFalse,
+		kTrue,
+		kContinue
 	};
 
 
-	enum Hook : UInt32
+	enum class Hook : UInt32
 	{
-		kHook_FirstPersonState,
-		kHook_ThirdPersonState,
-		kHook_Favorites,
-		kHook_Movement,
-		kHook_Look,
-		kHook_Sprint,
-		kHook_ReadyWeapon,
-		kHook_AutoMove,
-		kHook_ToggleRun,
-		kHook_Activate,
-		kHook_Jump,
-		kHook_Shout,
-		kHook_AttackBlock,
-		kHook_Run,
-		kHook_Sneak
+		kFirstPersonState,
+		kThirdPersonState,
+		kFavorites,
+		kMovement,
+		kLook,
+		kSprint,
+		kReadyWeapon,
+		kAutoMove,
+		kToggleRun,
+		kActivate,
+		kJump,
+		kShout,
+		kAttackBlock,
+		kRun,
+		kSneak
 	};
 
 
