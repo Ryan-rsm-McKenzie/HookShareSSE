@@ -6,6 +6,8 @@
 
 #include "HookShare.h"
 
+#include "RE/BShkbAnimationGraph.h"  // BShkbAnimationGraphPtr
+#include "RE/IAnimationGraphManagerHolder.h"  // IAnimationGraphManagerHolder
 #include "RE/Offsets.h"
 #include "RE/PlayerInputHandler.h"  // PlayerInputHandler
 
@@ -32,13 +34,12 @@ namespace Hooks
 				for (auto& reg : regs) {
 					ReturnType ret = reg(this, a_event);
 					switch (ret) {
-					case ReturnType::kReturnType_False:
+					case ReturnType::kFalse:
 						++retFalse;
 						break;
-					case ReturnType::kReturnType_True:
+					case ReturnType::kTrue:
 						++retTrue;
 						break;
-					case ReturnType::kReturnType_Continue:
 					default:
 						break;
 					}
@@ -84,6 +85,57 @@ namespace Hooks
 	typedef PlayerInputHandler<RE::SNEAK_HANDLER_VTBL + (0x1 * 0x8), HookShare::sneakRegs>										SneakHandlerEx;
 
 
+	class IAnimationGraphManagerHolderEx : public RE::IAnimationGraphManagerHolder
+	{
+	public:
+		typedef bool _ConstructBShkbAnimationGraph_t(RE::IAnimationGraphManagerHolder* a_this, RE::BShkbAnimationGraphPtr& a_out);
+		static _ConstructBShkbAnimationGraph_t* orig_PlayerCharacter_ConstructBShkbAnimationGraph;
+		static _ConstructBShkbAnimationGraph_t* orig_Actor_ConstructBShkbAnimationGraph;
+
+
+		bool Hook_PlayerCharacter_ConstructBShkbAnimationGraph(RE::BShkbAnimationGraphPtr& a_out)
+		{
+			RE::TESObjectREFR* refr = (RE::TESObjectREFR*)((uintptr_t)this - 0x38);
+			bool result = orig_PlayerCharacter_ConstructBShkbAnimationGraph(this, a_out);
+			for (auto& reg : HookShare::animationGraphEventRegs) {
+				reg(refr, a_out);
+			}
+			return result;
+		}
+
+
+		bool Hook_Actor_ConstructBShkbAnimationGraph(RE::BShkbAnimationGraphPtr& a_out)
+		{
+			RE::TESObjectREFR* refr = (RE::TESObjectREFR*)((uintptr_t)this - 0x38);
+			bool result = orig_Actor_ConstructBShkbAnimationGraph(this, a_out);
+			for (auto& reg : HookShare::animationGraphEventRegs) {
+				reg(refr, a_out);
+			}
+			return result;
+		}
+
+
+		static void InstallHooks()
+		{
+			constexpr uintptr_t PLAYER_CHARACTER_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL = 0x0167DFF0;
+			RelocPtr<_ConstructBShkbAnimationGraph_t*> vtbl_PlayerCharacter_ConstructBShkbAnimationGraph(PLAYER_CHARACTER_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL + (0x5 * 0x8));
+			orig_PlayerCharacter_ConstructBShkbAnimationGraph = *vtbl_PlayerCharacter_ConstructBShkbAnimationGraph;
+			SafeWrite64(vtbl_PlayerCharacter_ConstructBShkbAnimationGraph.GetUIntPtr(), GetFnAddr(&Hook_PlayerCharacter_ConstructBShkbAnimationGraph));
+
+			constexpr uintptr_t ACTOR_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL = 0x01670018;
+			RelocPtr<_ConstructBShkbAnimationGraph_t*> vtbl_Actor_ConstructBShkbAnimationGraph(ACTOR_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL + (0x5 * 0x8));
+			orig_Actor_ConstructBShkbAnimationGraph = *vtbl_Actor_ConstructBShkbAnimationGraph;
+			SafeWrite64(vtbl_Actor_ConstructBShkbAnimationGraph.GetUIntPtr(), GetFnAddr(&Hook_Actor_ConstructBShkbAnimationGraph));
+
+			_DMESSAGE("Installed hook for (%s)", typeid(IAnimationGraphManagerHolderEx).name());
+		}
+	};
+
+
+	IAnimationGraphManagerHolderEx::_ConstructBShkbAnimationGraph_t* IAnimationGraphManagerHolderEx::orig_PlayerCharacter_ConstructBShkbAnimationGraph;
+	IAnimationGraphManagerHolderEx::_ConstructBShkbAnimationGraph_t* IAnimationGraphManagerHolderEx::orig_Actor_ConstructBShkbAnimationGraph;
+
+
 	void InstallHooks()
 	{
 		FirstPersonStateHandlerEx::installHook();
@@ -101,5 +153,7 @@ namespace Hooks
 		AttackBlockHandlerEx::installHook();
 		RunHandlerEx::installHook();
 		SneakHandlerEx::installHook();
+
+		IAnimationGraphManagerHolderEx::InstallHooks();
 	}
 }

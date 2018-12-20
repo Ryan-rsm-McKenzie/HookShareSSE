@@ -1,16 +1,12 @@
 ﻿#include "common/IDebugLog.h"  // IDebugLog
-#include "skse64/GameEvents.h"  // EventDispatcherList
-#include "skse64/GameInput.h"  // InputEventDispatcher
-#include "skse64/GameMenus.h"  // MenuManager
-#include "skse64/PluginAPI.h"  // PluginHandle, SKSEMessagingInterface, SKSETaskInterface, SKSEInterface, PluginInfo
-#include "skse64_common/BranchTrampoline.h"  // g_branchTrampoline
+#include "skse64/PluginAPI.h"  // PluginHandle, SKSEMessagingInterface, SKSEInterface, PluginInfo
 #include "skse64_common/skse_version.h"  // RUNTIME_VERSION
 
 #include <ShlObj.h>  // CSIDL_MYDOCUMENTS
 
-#include "Hooks.h"  // InstallHooks()
-#include "HookShare.h"  // RegisterHook()
-#include "version.h"
+#include "Hooks.h"  // InstallHooks
+#include "HookShare.h"  // RegisterHook
+#include "version.h"  // HOOKSHARESSE_VERSION_VERSTRING
 
 
 static PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
@@ -21,7 +17,8 @@ void MessageHandler(SKSEMessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
 	case SKSEMessagingInterface::kMessage_DataLoaded:
-		g_messaging->Dispatch(g_pluginHandle, HOOK_SHARE_API_VERSION_MAJOR, HookShare::RegisterHook, 0, 0);
+		g_messaging->Dispatch(g_pluginHandle, HookShare::kType_CanProcess, HookShare::RegisterForCanProcess, HOOK_SHARE_API_VERSION_MAJOR, 0);
+		g_messaging->Dispatch(g_pluginHandle, HookShare::kType_AnimationGraphEvent, HookShare::RegisterForAnimationGraphEvent, HOOK_SHARE_API_VERSION_MAJOR, 0);
 		break;
 	}
 }
