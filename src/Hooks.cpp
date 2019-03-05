@@ -1,13 +1,14 @@
 #include "Hooks.h"
 
-#include "skse64_common/SafeWrite.h"  // SafeWrite64
+#include "skse64_common/BranchTrampoline.h"  // g_localTrampoline
+#include "skse64_common/Relocation.h"  // RelocAddr
+#include "skse64_common/SafeWrite.h"  // SafeWrite8
+#include "xbyak/xbyak.h"
 
 #include <vector>  // vector
 
 #include "HookShare.h"
 
-#include "RE/BShkbAnimationGraph.h"  // BShkbAnimationGraphPtr
-#include "RE/IAnimationGraphManagerHolder.h"  // IAnimationGraphManagerHolder
 #include "RE/Offsets.h"
 #include "RE/PlayerInputHandler.h"  // PlayerInputHandler
 
@@ -68,72 +69,43 @@ namespace Hooks
 
 
 	template <uintptr_t offset, std::vector<HookShare::_PlayerInputHandler_CanProcess_t*>& regs> typename PlayerInputHandler<offset, regs>::_CanProcess_t PlayerInputHandler<offset, regs>::orig_CanProcess;
-	typedef PlayerInputHandler<RE::FIRST_PERSON_STATE_VTBL + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>	FirstPersonStateHandlerEx;
-	typedef PlayerInputHandler<RE::THIRD_PERSON_STATE_VTBL + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>	ThirdPersonStateHandlerEx;
-	typedef PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL + (0x1 * 0x8), HookShare::favoritesRegs>								FavoritesHandlerEx;
-	typedef PlayerInputHandler<RE::MOVEMENT_HANDLER_VTBL + (0x1 * 0x8), HookShare::movementRegs>								MovementHandlerEx;
-	typedef PlayerInputHandler<RE::LOOK_HANDLER_VTBL + (0x1 * 0x8), HookShare::lookRegs>										LookHandlerEx;
-	typedef PlayerInputHandler<RE::SPRINT_HANDLER_VTBL + (0x1 * 0x8), HookShare::sprintRegs>									SprintHandlerEx;
-	typedef PlayerInputHandler<RE::READY_WEAPON_HANDLER_VTBL + (0x1 * 0x8), HookShare::readyWeaponRegs>							ReadyWeaponHandlerEx;
-	typedef PlayerInputHandler<RE::AUTO_MOVE_HANDLER_VTBL + (0x1 * 0x8), HookShare::autoMoveRegs>								AutoMoveHandlerEx;
-	typedef PlayerInputHandler<RE::TOGGLE_RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::toggleRunRegs>								ToggleRunHandlerEx;
-	typedef PlayerInputHandler<RE::ACTIVATE_HANDLER_VTBL + (0x1 * 0x8), HookShare::activateRegs>								ActivateHandlerEx;
-	typedef PlayerInputHandler<RE::JUMP_HANDLER_VTBL + (0x1 * 0x8), HookShare::jumpRegs>										JumpHandlerEx;
-	typedef PlayerInputHandler<RE::SHOUT_HANDLER_VTBL + (0x1 * 0x8), HookShare::shoutRegs>										ShoutHandlerEx;
-	typedef PlayerInputHandler<RE::ATTACK_BLOCK_HANDLER_VTBL + (0x1 * 0x8), HookShare::attackBlockRegs>							AttackBlockHandlerEx;
-	typedef PlayerInputHandler<RE::RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::runRegs>											RunHandlerEx;
-	typedef PlayerInputHandler<RE::SNEAK_HANDLER_VTBL + (0x1 * 0x8), HookShare::sneakRegs>										SneakHandlerEx;
+	using FirstPersonStateHandlerEx = PlayerInputHandler<RE::FIRST_PERSON_STATE_VTBL + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>;
+	using ThirdPersonStateHandlerEx = PlayerInputHandler<RE::THIRD_PERSON_STATE_VTBL + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>;
+	using FavoritesHandlerEx = PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL + (0x1 * 0x8), HookShare::favoritesRegs>;
+	using MovementHandlerEx = PlayerInputHandler<RE::MOVEMENT_HANDLER_VTBL + (0x1 * 0x8), HookShare::movementRegs>;
+	using LookHandlerEx = PlayerInputHandler<RE::LOOK_HANDLER_VTBL + (0x1 * 0x8), HookShare::lookRegs>;
+	using SprintHandlerEx = PlayerInputHandler<RE::SPRINT_HANDLER_VTBL + (0x1 * 0x8), HookShare::sprintRegs>;
+	using ReadyWeaponHandlerEx = PlayerInputHandler<RE::READY_WEAPON_HANDLER_VTBL + (0x1 * 0x8), HookShare::readyWeaponRegs>;
+	using AutoMoveHandlerEx = PlayerInputHandler<RE::AUTO_MOVE_HANDLER_VTBL + (0x1 * 0x8), HookShare::autoMoveRegs>;
+	using ToggleRunHandlerEx = PlayerInputHandler<RE::TOGGLE_RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::toggleRunRegs>;
+	using ActivateHandlerEx = PlayerInputHandler<RE::ACTIVATE_HANDLER_VTBL + (0x1 * 0x8), HookShare::activateRegs>;
+	using JumpHandlerEx = PlayerInputHandler<RE::JUMP_HANDLER_VTBL + (0x1 * 0x8), HookShare::jumpRegs>;
+	using ShoutHandlerEx = PlayerInputHandler<RE::SHOUT_HANDLER_VTBL + (0x1 * 0x8), HookShare::shoutRegs>;
+	using AttackBlockHandlerEx = PlayerInputHandler<RE::ATTACK_BLOCK_HANDLER_VTBL + (0x1 * 0x8), HookShare::attackBlockRegs>;
+	using RunHandlerEx = PlayerInputHandler<RE::RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::runRegs>;
+	using SneakHandlerEx = PlayerInputHandler<RE::SNEAK_HANDLER_VTBL + (0x1 * 0x8), HookShare::sneakRegs>;
 
 
-	class IAnimationGraphManagerHolderEx : public RE::IAnimationGraphManagerHolder
+	void PatchMiscStatHandlers()
 	{
-	public:
-		typedef bool _ConstructBShkbAnimationGraph_t(RE::IAnimationGraphManagerHolder* a_this, RE::BShkbAnimationGraphPtr& a_out);
-		static _ConstructBShkbAnimationGraph_t* orig_PlayerCharacter_ConstructBShkbAnimationGraph;
-		static _ConstructBShkbAnimationGraph_t* orig_Actor_ConstructBShkbAnimationGraph;
-
-
-		bool Hook_PlayerCharacter_ConstructBShkbAnimationGraph(RE::BShkbAnimationGraphPtr& a_out)
+		constexpr uintptr_t TARGET_FUNC = 0x001F7BF0;
+		RelocAddr<uintptr_t> target(TARGET_FUNC + 0x14);
+		struct Patch : Xbyak::CodeGenerator
 		{
-			RE::TESObjectREFR* refr = (RE::TESObjectREFR*)((uintptr_t)this - 0x38);
-			bool result = orig_PlayerCharacter_ConstructBShkbAnimationGraph(this, a_out);
-			for (auto& reg : HookShare::animationGraphEventRegs) {
-				reg(refr, a_out);
+			Patch(void* a_buf) : Xbyak::CodeGenerator(1024, a_buf)
+			{
+				or (r11d, 0x0F);
 			}
-			return result;
+		};
+		void* patchBuf = g_localTrampoline.StartAlloc();
+		Patch patch(patchBuf);
+		g_localTrampoline.EndAlloc(patch.getCurr());
+		assert(patch.getSize() == 4);
+		for (UInt32 i = 0; i < patch.getSize(); ++i) {
+			SafeWrite8(target.GetUIntPtr() + i, patch.getCode()[i]);
 		}
-
-
-		bool Hook_Actor_ConstructBShkbAnimationGraph(RE::BShkbAnimationGraphPtr& a_out)
-		{
-			RE::TESObjectREFR* refr = (RE::TESObjectREFR*)((uintptr_t)this - 0x38);
-			bool result = orig_Actor_ConstructBShkbAnimationGraph(this, a_out);
-			for (auto& reg : HookShare::animationGraphEventRegs) {
-				reg(refr, a_out);
-			}
-			return result;
-		}
-
-
-		static void InstallHooks()
-		{
-			constexpr uintptr_t PLAYER_CHARACTER_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL = 0x0167DFF0;
-			RelocPtr<_ConstructBShkbAnimationGraph_t*> vtbl_PlayerCharacter_ConstructBShkbAnimationGraph(PLAYER_CHARACTER_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL + (0x5 * 0x8));
-			orig_PlayerCharacter_ConstructBShkbAnimationGraph = *vtbl_PlayerCharacter_ConstructBShkbAnimationGraph;
-			SafeWrite64(vtbl_PlayerCharacter_ConstructBShkbAnimationGraph.GetUIntPtr(), GetFnAddr(&Hook_PlayerCharacter_ConstructBShkbAnimationGraph));
-
-			constexpr uintptr_t ACTOR_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL = 0x01670018;
-			RelocPtr<_ConstructBShkbAnimationGraph_t*> vtbl_Actor_ConstructBShkbAnimationGraph(ACTOR_I_ANIMATION_GRAPH_MANAGER_HOLDER_VTBL + (0x5 * 0x8));
-			orig_Actor_ConstructBShkbAnimationGraph = *vtbl_Actor_ConstructBShkbAnimationGraph;
-			SafeWrite64(vtbl_Actor_ConstructBShkbAnimationGraph.GetUIntPtr(), GetFnAddr(&Hook_Actor_ConstructBShkbAnimationGraph));
-
-			_DMESSAGE("Installed hook for (%s)", typeid(IAnimationGraphManagerHolderEx).name());
-		}
-	};
-
-
-	IAnimationGraphManagerHolderEx::_ConstructBShkbAnimationGraph_t* IAnimationGraphManagerHolderEx::orig_PlayerCharacter_ConstructBShkbAnimationGraph;
-	IAnimationGraphManagerHolderEx::_ConstructBShkbAnimationGraph_t* IAnimationGraphManagerHolderEx::orig_Actor_ConstructBShkbAnimationGraph;
+		_DMESSAGE("[DEBUG] Installed patch for misc stat event dispatchers");
+	}
 
 
 	void InstallHooks()
@@ -154,6 +126,6 @@ namespace Hooks
 		RunHandlerEx::installHook();
 		SneakHandlerEx::installHook();
 
-		IAnimationGraphManagerHolderEx::InstallHooks();
+		PatchMiscStatHandlers();
 	}
 }

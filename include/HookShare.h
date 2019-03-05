@@ -40,15 +40,13 @@ namespace HookShare
 		kShout = 11,
 		kAttackBlock = 12,
 		kRun = 13,
-		kSneak = 14,
-		kPlayerAnimationGraphEvent = 15
+		kSneak = 14
 	};
 
 
 	enum Type : UInt32
 	{
-		kType_CanProcess = 0,
-		kType_AnimationGraphEvent = 1
+		kType_CanProcess = 0
 	};
 
 
@@ -69,12 +67,10 @@ namespace HookShare
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> runRegs;
 	extern std::vector<_PlayerInputHandler_CanProcess_t*> sneakRegs;
 
+	/* REGS BEGIN */
+
 	typedef void _RegisterForCanProcess_t(_PlayerInputHandler_CanProcess_t* a_func, Hook a_hookType);
 	void RegisterForCanProcess(_PlayerInputHandler_CanProcess_t* a_func, Hook a_hookType);
 
-	typedef void _IAnimationGraphManager_ConstructBShkbAnimationGraph_t(RE::TESObjectREFR* a_refr, RE::BShkbAnimationGraphPtr& a_animGraph);
-	extern std::vector<_IAnimationGraphManager_ConstructBShkbAnimationGraph_t*> animationGraphEventRegs;
-
-	typedef void _RegisterForAnimationGraphEvent_t(_IAnimationGraphManager_ConstructBShkbAnimationGraph_t* a_func, Hook a_hookType);
-	void RegisterForAnimationGraphEvent(_IAnimationGraphManager_ConstructBShkbAnimationGraph_t* a_func, Hook a_type);
+	/* REGS END */
 }

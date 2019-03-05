@@ -1,6 +1,7 @@
 ﻿#include "common/IDebugLog.h"  // IDebugLog
-#include "skse64/PluginAPI.h"  // PluginHandle, SKSEMessagingInterface, SKSEInterface, PluginInfo
+#include "skse64_common/BranchTrampoline.h"  // g_localTrampoline
 #include "skse64_common/skse_version.h"  // RUNTIME_VERSION
+#include "skse64/PluginAPI.h"  // PluginHandle, SKSEMessagingInterface, SKSEInterface, PluginInfo
 
 #include <ShlObj.h>  // CSIDL_MYDOCUMENTS
 
@@ -18,7 +19,6 @@ void MessageHandler(SKSEMessagingInterface::Message* a_msg)
 	switch (a_msg->type) {
 	case SKSEMessagingInterface::kMessage_DataLoaded:
 		g_messaging->Dispatch(g_pluginHandle, HookShare::kType_CanProcess, HookShare::RegisterForCanProcess, HOOK_SHARE_API_VERSION_MAJOR, 0);
-		g_messaging->Dispatch(g_pluginHandle, HookShare::kType_AnimationGraphEvent, HookShare::RegisterForAnimationGraphEvent, HOOK_SHARE_API_VERSION_MAJOR, 0);
 		break;
 	}
 }
@@ -56,6 +56,13 @@ extern "C" {
 	bool SKSEPlugin_Load(const SKSEInterface* a_skse)
 	{
 		_MESSAGE("[MESSAGE] HookShareSSE loaded");
+
+		if (g_localTrampoline.Create(1024 * 8)) {
+			_MESSAGE("[MESSAGE] Local trampoline creation successfull");
+		} else {
+			_MESSAGE("[FATAL ERROR] Local trampoline creation failed!\n");
+			return false;
+		}
 
 		g_messaging = (SKSEMessagingInterface*)a_skse->QueryInterface(kInterface_Messaging);
 		if (g_messaging->RegisterListener(g_pluginHandle, "SKSE", MessageHandler)) {
