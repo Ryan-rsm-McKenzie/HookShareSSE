@@ -9,8 +9,7 @@
 
 #include "HookShare.h"
 
-#include "RE/Offsets.h"
-#include "RE/PlayerInputHandler.h"  // PlayerInputHandler
+#include "RE/Skyrim.h"
 
 
 namespace Hooks
@@ -69,26 +68,27 @@ namespace Hooks
 
 
 	template <uintptr_t offset, std::vector<HookShare::_PlayerInputHandler_CanProcess_t*>& regs> typename PlayerInputHandler<offset, regs>::_CanProcess_t PlayerInputHandler<offset, regs>::orig_CanProcess;
-	using FirstPersonStateHandlerEx = PlayerInputHandler<RE::FIRST_PERSON_STATE_VTBL + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>;
-	using ThirdPersonStateHandlerEx = PlayerInputHandler<RE::THIRD_PERSON_STATE_VTBL + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>;
-	using FavoritesHandlerEx = PlayerInputHandler<RE::FAVORITES_HANDLER_VTBL + (0x1 * 0x8), HookShare::favoritesRegs>;
-	using MovementHandlerEx = PlayerInputHandler<RE::MOVEMENT_HANDLER_VTBL + (0x1 * 0x8), HookShare::movementRegs>;
-	using LookHandlerEx = PlayerInputHandler<RE::LOOK_HANDLER_VTBL + (0x1 * 0x8), HookShare::lookRegs>;
-	using SprintHandlerEx = PlayerInputHandler<RE::SPRINT_HANDLER_VTBL + (0x1 * 0x8), HookShare::sprintRegs>;
-	using ReadyWeaponHandlerEx = PlayerInputHandler<RE::READY_WEAPON_HANDLER_VTBL + (0x1 * 0x8), HookShare::readyWeaponRegs>;
-	using AutoMoveHandlerEx = PlayerInputHandler<RE::AUTO_MOVE_HANDLER_VTBL + (0x1 * 0x8), HookShare::autoMoveRegs>;
-	using ToggleRunHandlerEx = PlayerInputHandler<RE::TOGGLE_RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::toggleRunRegs>;
-	using ActivateHandlerEx = PlayerInputHandler<RE::ACTIVATE_HANDLER_VTBL + (0x1 * 0x8), HookShare::activateRegs>;
-	using JumpHandlerEx = PlayerInputHandler<RE::JUMP_HANDLER_VTBL + (0x1 * 0x8), HookShare::jumpRegs>;
-	using ShoutHandlerEx = PlayerInputHandler<RE::SHOUT_HANDLER_VTBL + (0x1 * 0x8), HookShare::shoutRegs>;
-	using AttackBlockHandlerEx = PlayerInputHandler<RE::ATTACK_BLOCK_HANDLER_VTBL + (0x1 * 0x8), HookShare::attackBlockRegs>;
-	using RunHandlerEx = PlayerInputHandler<RE::RUN_HANDLER_VTBL + (0x1 * 0x8), HookShare::runRegs>;
-	using SneakHandlerEx = PlayerInputHandler<RE::SNEAK_HANDLER_VTBL + (0x1 * 0x8), HookShare::sneakRegs>;
+	using FirstPersonStateHandlerEx = PlayerInputHandler<RE::Offset::FirstPersonState::Vtbl + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>;
+	using ThirdPersonStateHandlerEx = PlayerInputHandler<RE::Offset::ThirdPersonState::Vtbl + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>;
+	using FavoritesHandlerEx = PlayerInputHandler<RE::Offset::FavoritesHandler::Vtbl + (0x1 * 0x8), HookShare::favoritesRegs>;
+	using MovementHandlerEx = PlayerInputHandler<RE::Offset::MovementHandler::Vtbl + (0x1 * 0x8), HookShare::movementRegs>;
+	using LookHandlerEx = PlayerInputHandler<RE::Offset::LookHandler::Vtbl + (0x1 * 0x8), HookShare::lookRegs>;
+	using SprintHandlerEx = PlayerInputHandler<RE::Offset::SprintHandler::Vtbl + (0x1 * 0x8), HookShare::sprintRegs>;
+	using ReadyWeaponHandlerEx = PlayerInputHandler<RE::Offset::ReadyWeaponHandler::Vtbl + (0x1 * 0x8), HookShare::readyWeaponRegs>;
+	using AutoMoveHandlerEx = PlayerInputHandler<RE::Offset::AutoMoveHandler::Vtbl + (0x1 * 0x8), HookShare::autoMoveRegs>;
+	using ToggleRunHandlerEx = PlayerInputHandler<RE::Offset::ToggleRunHandler::Vtbl + (0x1 * 0x8), HookShare::toggleRunRegs>;
+	using ActivateHandlerEx = PlayerInputHandler<RE::Offset::ActivateHandler::Vtbl + (0x1 * 0x8), HookShare::activateRegs>;
+	using JumpHandlerEx = PlayerInputHandler<RE::Offset::JumpHandler::Vtbl + (0x1 * 0x8), HookShare::jumpRegs>;
+	using ShoutHandlerEx = PlayerInputHandler<RE::Offset::ShoutHandler::Vtbl + (0x1 * 0x8), HookShare::shoutRegs>;
+	using AttackBlockHandlerEx = PlayerInputHandler<RE::Offset::AttackBlockHandler::Vtbl + (0x1 * 0x8), HookShare::attackBlockRegs>;
+	using RunHandlerEx = PlayerInputHandler<RE::Offset::RunHandler::Vtbl + (0x1 * 0x8), HookShare::runRegs>;
+	using SneakHandlerEx = PlayerInputHandler<RE::Offset::SneakHandler::Vtbl + (0x1 * 0x8), HookShare::sneakRegs>;
 
 
 	void PatchMiscStatHandlers()
 	{
-		constexpr uintptr_t TARGET_FUNC = 0x001F7BF0;
+		// E8 ? ? ? ? 80 7B 0A 00
+		constexpr uintptr_t TARGET_FUNC = 0x001F7BF0;	// 1_5_62
 		RelocAddr<uintptr_t> target(TARGET_FUNC + 0x14);
 		struct Patch : Xbyak::CodeGenerator
 		{
@@ -126,6 +126,6 @@ namespace Hooks
 		RunHandlerEx::installHook();
 		SneakHandlerEx::installHook();
 
-		PatchMiscStatHandlers();
+		//PatchMiscStatHandlers();
 	}
 }
