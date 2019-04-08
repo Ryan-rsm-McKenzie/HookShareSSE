@@ -1,7 +1,5 @@
-﻿#include "common/IDebugLog.h"  // IDebugLog
-#include "skse64_common/BranchTrampoline.h"  // g_localTrampoline
+﻿#include "skse64_common/BranchTrampoline.h"  // g_localTrampoline
 #include "skse64_common/skse_version.h"  // RUNTIME_VERSION
-#include "skse64/PluginAPI.h"  // PluginHandle, SKSEMessagingInterface, SKSEInterface, PluginInfo
 
 #include <ShlObj.h>  // CSIDL_MYDOCUMENTS
 
@@ -9,23 +7,24 @@
 #include "HookShare.h"  // RegisterHook
 #include "version.h"  // HOOKSHARESSE_VERSION_VERSTRING
 
-
-static PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
-static SKSEMessagingInterface* g_messaging = 0;
+#include "SKSE/API.h"
 
 
-void MessageHandler(SKSEMessagingInterface::Message* a_msg)
+void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
-	case SKSEMessagingInterface::kMessage_DataLoaded:
-		g_messaging->Dispatch(g_pluginHandle, HookShare::kType_CanProcess, HookShare::RegisterForCanProcess, HOOK_SHARE_API_VERSION_MAJOR, 0);
+	case SKSE::MessagingInterface::kDataLoaded:
+		{
+			auto messaging = SKSE::GetMessagingInterface();
+			messaging->Dispatch(HookShare::kType_CanProcess, HookShare::RegisterForCanProcess, HookShare::kAPIVersionMajor, 0);
+		}
 		break;
 	}
 }
 
 
 extern "C" {
-	bool SKSEPlugin_Query(const SKSEInterface* a_skse, PluginInfo* a_info)
+	bool SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 	{
 		gLog.OpenRelative(CSIDL_MYDOCUMENTS, "\\My Games\\Skyrim Special Edition\\SKSE\\HookShareSSE.log");
 		gLog.SetPrintLevel(IDebugLog::kLevel_DebugMessage);
@@ -35,16 +34,12 @@ extern "C" {
 
 		a_info->infoVersion = PluginInfo::kInfoVersion;
 		a_info->name = "HookShareSSE";
-		a_info->version = HOOK_SHARE_API_VERSION_MAJOR;
-
-		g_pluginHandle = a_skse->GetPluginHandle();
+		a_info->version = HookShare::kAPIVersionMajor;
 
 		if (a_skse->isEditor) {
 			_FATALERROR("[FATAL ERROR] Loaded in editor, marking as incompatible!\n");
 			return false;
-		}
-
-		if (a_skse->runtimeVersion != RUNTIME_VERSION_1_5_73) {
+		} else if (a_skse->runtimeVersion != RUNTIME_VERSION_1_5_73) {
 			_FATALERROR("[FATAL ERROR] Unsupported runtime version %08X!\n", a_skse->runtimeVersion);
 			return false;
 		}
@@ -53,9 +48,13 @@ extern "C" {
 	}
 
 
-	bool SKSEPlugin_Load(const SKSEInterface* a_skse)
+	bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 	{
 		_MESSAGE("[MESSAGE] HookShareSSE loaded");
+
+		if (!SKSE::Init(a_skse)) {
+			return false;
+		}
 
 		if (g_localTrampoline.Create(1024 * 8)) {
 			_MESSAGE("[MESSAGE] Local trampoline creation successfull");
@@ -64,8 +63,8 @@ extern "C" {
 			return false;
 		}
 
-		g_messaging = (SKSEMessagingInterface*)a_skse->QueryInterface(kInterface_Messaging);
-		if (g_messaging->RegisterListener(g_pluginHandle, "SKSE", MessageHandler)) {
+		auto messaging = SKSE::GetMessagingInterface();
+		if (messaging->RegisterListener("SKSE", MessageHandler)) {
 			_MESSAGE("[MESSAGE] Messaging interface registration successful");
 		} else {
 			_FATALERROR("[FATAL ERROR] Messaging interface registration failed!\n");

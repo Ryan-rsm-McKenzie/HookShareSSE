@@ -5,6 +5,7 @@
 #include "skse64_common/SafeWrite.h"  // SafeWrite8
 #include "xbyak/xbyak.h"
 
+#include <cstdint>  // uintptr_t
 #include <vector>  // vector
 
 #include "HookShare.h"
@@ -14,30 +15,29 @@
 
 namespace Hooks
 {
-	template <uintptr_t offset, std::vector<HookShare::_PlayerInputHandler_CanProcess_t*>& regs>
+	template <std::uintptr_t offset, HookShare::PlayerInputHandler_CanProcess_regs& regs>
 	class PlayerInputHandler : public RE::PlayerInputHandler
 	{
 	public:
-		typedef bool(PlayerInputHandler::*_CanProcess_t)(RE::InputEvent* a_event);
-		static _CanProcess_t orig_CanProcess;
+		using CanProcess_t = function_type_t<decltype(&RE::PlayerInputHandler::CanProcess)>;
+		static inline CanProcess_t* orig_CanProcess;
 
 
 		bool hook_CanProcess(RE::InputEvent* a_event)
 		{
-			using HookShare::ReturnType;
+			using HookShare::result_type;
 
-			bool result = (this->*orig_CanProcess)(a_event);
+			bool result = orig_CanProcess(this, a_event);
 
 			if (a_event && !regs.empty()) {
 				UInt32 retFalse = 0;
 				UInt32 retTrue = 0;
 				for (auto& reg : regs) {
-					ReturnType ret = reg(this, a_event);
-					switch (ret) {
-					case ReturnType::kFalse:
+					switch (reg(this, a_event)) {
+					case result_type::kFalse:
 						++retFalse;
 						break;
-					case ReturnType::kTrue:
+					case result_type::kTrue:
 						++retTrue;
 						break;
 					default:
@@ -60,14 +60,13 @@ namespace Hooks
 
 		static void installHook()
 		{
-			RelocPtr<_CanProcess_t> vtbl_CanProcess(offset);
+			RelocPtr<CanProcess_t*> vtbl_CanProcess(offset);
 			orig_CanProcess = *vtbl_CanProcess;
 			SafeWrite64(vtbl_CanProcess.GetUIntPtr(), GetFnAddr(&hook_CanProcess));
 		}
 	};
 
 
-	template <uintptr_t offset, std::vector<HookShare::_PlayerInputHandler_CanProcess_t*>& regs> typename PlayerInputHandler<offset, regs>::_CanProcess_t PlayerInputHandler<offset, regs>::orig_CanProcess;
 	using FirstPersonStateHandlerEx = PlayerInputHandler<RE::Offset::FirstPersonState::Vtbl + (0x8 * 0x8) + 0x10 + (0x1 * 0x8), HookShare::firstPersonStateRegs>;
 	using ThirdPersonStateHandlerEx = PlayerInputHandler<RE::Offset::ThirdPersonState::Vtbl + (0xF * 0x8) + 0x10 + (0x1 * 0x8), HookShare::thirdPersonStateRegs>;
 	using FavoritesHandlerEx = PlayerInputHandler<RE::Offset::FavoritesHandler::Vtbl + (0x1 * 0x8), HookShare::favoritesRegs>;
@@ -88,8 +87,8 @@ namespace Hooks
 	void PatchMiscStatHandlers()
 	{
 		// E8 ? ? ? ? 80 7B 0A 00
-		constexpr uintptr_t TARGET_FUNC = 0x001F7BF0;	// 1_5_62
-		RelocAddr<uintptr_t> target(TARGET_FUNC + 0x14);
+		constexpr std::uintptr_t TARGET_FUNC = 0x001F7BF0;	// 1_5_62
+		RelocAddr<std::uintptr_t> target(TARGET_FUNC + 0x14);
 		struct Patch : Xbyak::CodeGenerator
 		{
 			Patch(void* a_buf) : Xbyak::CodeGenerator(1024, a_buf)

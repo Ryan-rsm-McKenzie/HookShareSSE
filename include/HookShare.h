@@ -11,12 +11,12 @@ namespace RE
 }
 
 
-#define HOOK_SHARE_API_VERSION_MAJOR	3
-
-
 namespace HookShare
 {
-	enum class ReturnType : UInt32
+	enum { kAPIVersionMajor = 4 };
+
+
+	enum class result_type : UInt32
 	{
 		kFalse = 0,
 		kTrue = 1,
@@ -50,27 +50,28 @@ namespace HookShare
 	};
 
 
-	typedef ReturnType _PlayerInputHandler_CanProcess_t(RE::PlayerInputHandler* a_this, RE::InputEvent* a_event);
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> firstPersonStateRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> thirdPersonStateRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> favoritesRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> movementRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> lookRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> sprintRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> readyWeaponRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> autoMoveRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> toggleRunRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> activateRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> jumpRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> shoutRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> attackBlockRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> runRegs;
-	extern std::vector<_PlayerInputHandler_CanProcess_t*> sneakRegs;
+	using PlayerInputHandler_CanProcess_t = result_type(RE::PlayerInputHandler* a_this, RE::InputEvent* a_event);
+	using PlayerInputHandler_CanProcess_regs = std::vector<PlayerInputHandler_CanProcess_t*>;
+	extern PlayerInputHandler_CanProcess_regs firstPersonStateRegs;
+	extern PlayerInputHandler_CanProcess_regs thirdPersonStateRegs;
+	extern PlayerInputHandler_CanProcess_regs favoritesRegs;
+	extern PlayerInputHandler_CanProcess_regs movementRegs;
+	extern PlayerInputHandler_CanProcess_regs lookRegs;
+	extern PlayerInputHandler_CanProcess_regs sprintRegs;
+	extern PlayerInputHandler_CanProcess_regs readyWeaponRegs;
+	extern PlayerInputHandler_CanProcess_regs autoMoveRegs;
+	extern PlayerInputHandler_CanProcess_regs toggleRunRegs;
+	extern PlayerInputHandler_CanProcess_regs activateRegs;
+	extern PlayerInputHandler_CanProcess_regs jumpRegs;
+	extern PlayerInputHandler_CanProcess_regs shoutRegs;
+	extern PlayerInputHandler_CanProcess_regs attackBlockRegs;
+	extern PlayerInputHandler_CanProcess_regs runRegs;
+	extern PlayerInputHandler_CanProcess_regs sneakRegs;
 
 	/* REGS BEGIN */
 
-	typedef void _RegisterForCanProcess_t(_PlayerInputHandler_CanProcess_t* a_func, Hook a_hookType);
-	void RegisterForCanProcess(_PlayerInputHandler_CanProcess_t* a_func, Hook a_hookType);
+	using RegisterForCanProcess_t = void(Hook a_hookType, PlayerInputHandler_CanProcess_t* a_func);
+	void RegisterForCanProcess(Hook a_hookType, PlayerInputHandler_CanProcess_t* a_func);
 
 	/* REGS END */
 }
