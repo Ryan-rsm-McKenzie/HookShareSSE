@@ -5,7 +5,7 @@
 
 #include "Hooks.h"  // InstallHooks
 #include "HookShare.h"  // RegisterHook
-#include "version.h"  // HOOKSHARESSE_VERSION_VERSTRING
+#include "version.h"  // VERSION_VERSTRING
 
 #include "SKSE/API.h"
 
@@ -30,17 +30,17 @@ extern "C" {
 		gLog.SetPrintLevel(IDebugLog::kLevel_DebugMessage);
 		gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
-		_MESSAGE("HookShareSSE v%s", HOOKSHARESSE_VERSION_VERSTRING);
+		_MESSAGE("HookShareSSE v%s", HSHR_VERSION_VERSTRING);
 
-		a_info->infoVersion = PluginInfo::kInfoVersion;
+		a_info->infoVersion = SKSE::PluginInfo::kVersion;
 		a_info->name = "HookShareSSE";
 		a_info->version = HookShare::kAPIVersionMajor;
 
-		if (a_skse->isEditor) {
+		if (a_skse->IsEditor()) {
 			_FATALERROR("[FATAL ERROR] Loaded in editor, marking as incompatible!\n");
 			return false;
-		} else if (a_skse->runtimeVersion != RUNTIME_VERSION_1_5_73) {
-			_FATALERROR("[FATAL ERROR] Unsupported runtime version %08X!\n", a_skse->runtimeVersion);
+		} else if (a_skse->RuntimeVersion() != RUNTIME_VERSION_1_5_73) {
+			_FATALERROR("[FATAL ERROR] Unsupported runtime version %08X!\n", a_skse->RuntimeVersion());
 			return false;
 		}
 

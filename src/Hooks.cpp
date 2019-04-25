@@ -1,7 +1,6 @@
 #include "Hooks.h"
 
 #include "skse64_common/BranchTrampoline.h"  // g_localTrampoline
-#include "skse64_common/Relocation.h"  // RelocAddr
 #include "skse64_common/SafeWrite.h"  // SafeWrite8
 #include "xbyak/xbyak.h"
 
@@ -11,6 +10,7 @@
 #include "HookShare.h"
 
 #include "RE/Skyrim.h"
+#include "REL/Relocation.h"
 
 
 namespace Hooks
@@ -19,15 +19,15 @@ namespace Hooks
 	class PlayerInputHandler : public RE::PlayerInputHandler
 	{
 	public:
-		using CanProcess_t = function_type_t<decltype(&RE::PlayerInputHandler::CanProcess)>;
-		static inline CanProcess_t* orig_CanProcess;
+		using func_t = function_type_t<decltype(&RE::PlayerInputHandler::CanProcess)>;
+		static inline func_t* func;
 
 
 		bool hook_CanProcess(RE::InputEvent* a_event)
 		{
 			using HookShare::result_type;
 
-			bool result = orig_CanProcess(this, a_event);
+			bool result = func(this, a_event);
 
 			if (a_event && !regs.empty()) {
 				UInt32 retFalse = 0;
@@ -60,9 +60,9 @@ namespace Hooks
 
 		static void installHook()
 		{
-			RelocPtr<CanProcess_t*> vtbl_CanProcess(offset);
-			orig_CanProcess = *vtbl_CanProcess;
-			SafeWrite64(vtbl_CanProcess.GetUIntPtr(), GetFnAddr(&hook_CanProcess));
+			REL::Offset<func_t**> vFunc(offset);
+			func = *vFunc;
+			SafeWrite64(vFunc.GetAddress(), GetFnAddr(&hook_CanProcess));
 		}
 	};
 
@@ -88,7 +88,7 @@ namespace Hooks
 	{
 		// E8 ? ? ? ? 80 7B 0A 00
 		constexpr std::uintptr_t TARGET_FUNC = 0x001F7BF0;	// 1_5_62
-		RelocAddr<std::uintptr_t> target(TARGET_FUNC + 0x14);
+		REL::Offset<std::uintptr_t> target(TARGET_FUNC + 0x14);
 		struct Patch : Xbyak::CodeGenerator
 		{
 			Patch(void* a_buf) : Xbyak::CodeGenerator(1024, a_buf)
@@ -101,7 +101,7 @@ namespace Hooks
 		g_localTrampoline.EndAlloc(patch.getCurr());
 		assert(patch.getSize() == 4);
 		for (UInt32 i = 0; i < patch.getSize(); ++i) {
-			SafeWrite8(target.GetUIntPtr() + i, patch.getCode()[i]);
+			SafeWrite8(target.GetAddress() + i, patch.getCode()[i]);
 		}
 		_DMESSAGE("[DEBUG] Installed patch for misc stat event dispatchers");
 	}
