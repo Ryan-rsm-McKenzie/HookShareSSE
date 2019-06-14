@@ -39,7 +39,13 @@ extern "C" {
 		if (a_skse->IsEditor()) {
 			_FATALERROR("[FATAL ERROR] Loaded in editor, marking as incompatible!\n");
 			return false;
-		} else if (a_skse->RuntimeVersion() != RUNTIME_VERSION_1_5_73) {
+		}
+
+		switch (a_skse->RuntimeVersion()) {
+		case RUNTIME_VERSION_1_5_73:
+		case RUNTIME_VERSION_1_5_80:
+			break;
+		default:
 			_FATALERROR("[FATAL ERROR] Unsupported runtime version %08X!\n", a_skse->RuntimeVersion());
 			return false;
 		}
