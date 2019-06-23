@@ -1,8 +1,6 @@
 ﻿#include "skse64_common/BranchTrampoline.h"  // g_localTrampoline
 #include "skse64_common/skse_version.h"  // RUNTIME_VERSION
 
-#include <ShlObj.h>  // CSIDL_MYDOCUMENTS
-
 #include "Hooks.h"  // InstallHooks
 #include "HookShare.h"  // RegisterHook
 #include "version.h"  // VERSION_VERSTRING
@@ -26,9 +24,9 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 extern "C" {
 	bool SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 	{
-		gLog.OpenRelative(CSIDL_MYDOCUMENTS, "\\My Games\\Skyrim Special Edition\\SKSE\\HookShareSSE.log");
-		gLog.SetPrintLevel(IDebugLog::kLevel_DebugMessage);
-		gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
+		SKSE::Logger::OpenRelative(FOLDERID_Documents, L"\\My Games\\Skyrim Special Edition\\SKSE\\HookShareSSE.log");
+		SKSE::Logger::SetPrintLevel(SKSE::Logger::Level::kDebugMessage);
+		SKSE::Logger::SetFlushLevel(SKSE::Logger::Level::kDebugMessage);
 
 		_MESSAGE("HookShareSSE v%s", HSHR_VERSION_VERSTRING);
 
