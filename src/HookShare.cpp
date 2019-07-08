@@ -140,7 +140,7 @@ namespace HookShare
 			RegisterFunc(a_hookType, a_func);
 			break;
 		default:
-			_ERROR("[ERROR] Hook type was not valid for CanProcess (%i)!\n", a_hookType);
+			_ERROR("Hook type was not valid for CanProcess (%i)!\n", a_hookType);
 			break;
 		}
 	}

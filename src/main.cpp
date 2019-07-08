@@ -27,6 +27,7 @@ extern "C" {
 		SKSE::Logger::OpenRelative(FOLDERID_Documents, L"\\My Games\\Skyrim Special Edition\\SKSE\\HookShareSSE.log");
 		SKSE::Logger::SetPrintLevel(SKSE::Logger::Level::kDebugMessage);
 		SKSE::Logger::SetFlushLevel(SKSE::Logger::Level::kDebugMessage);
+		SKSE::Logger::UseLogStamp(true);
 
 		_MESSAGE("HookShareSSE v%s", HSHR_VERSION_VERSTRING);
 
@@ -35,7 +36,7 @@ extern "C" {
 		a_info->version = HookShare::kAPIVersionMajor;
 
 		if (a_skse->IsEditor()) {
-			_FATALERROR("[FATAL ERROR] Loaded in editor, marking as incompatible!\n");
+			_FATALERROR("Loaded in editor, marking as incompatible!\n");
 			return false;
 		}
 
@@ -44,7 +45,7 @@ extern "C" {
 		case RUNTIME_VERSION_1_5_80:
 			break;
 		default:
-			_FATALERROR("[FATAL ERROR] Unsupported runtime version %08X!\n", a_skse->RuntimeVersion());
+			_FATALERROR("Unsupported runtime version %08X!\n", a_skse->RuntimeVersion());
 			return false;
 		}
 
@@ -54,29 +55,29 @@ extern "C" {
 
 	bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 	{
-		_MESSAGE("[MESSAGE] HookShareSSE loaded");
+		_MESSAGE("HookShareSSE loaded");
 
 		if (!SKSE::Init(a_skse)) {
 			return false;
 		}
 
 		if (g_localTrampoline.Create(1024 * 8)) {
-			_MESSAGE("[MESSAGE] Local trampoline creation successfull");
+			_MESSAGE("Local trampoline creation successfull");
 		} else {
-			_MESSAGE("[FATAL ERROR] Local trampoline creation failed!\n");
+			_MESSAGE("Local trampoline creation failed!\n");
 			return false;
 		}
 
 		auto messaging = SKSE::GetMessagingInterface();
 		if (messaging->RegisterListener("SKSE", MessageHandler)) {
-			_MESSAGE("[MESSAGE] Messaging interface registration successful");
+			_MESSAGE("Messaging interface registration successful");
 		} else {
-			_FATALERROR("[FATAL ERROR] Messaging interface registration failed!\n");
+			_FATALERROR("Messaging interface registration failed!\n");
 			return false;
 		}
 
 		Hooks::InstallHooks();
-		_MESSAGE("[MESSAGE] Hooks installed");
+		_MESSAGE("Hooks installed");
 
 		return true;
 	}

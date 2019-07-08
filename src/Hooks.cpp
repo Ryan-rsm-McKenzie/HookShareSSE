@@ -103,7 +103,7 @@ namespace Hooks
 		for (UInt32 i = 0; i < patch.getSize(); ++i) {
 			SafeWrite8(target.GetAddress() + i, patch.getCode()[i]);
 		}
-		_DMESSAGE("[DEBUG] Installed patch for misc stat event dispatchers");
+		_DMESSAGE("Installed patch for misc stat event dispatchers");
 	}
 
 
