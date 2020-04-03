@@ -39,15 +39,18 @@ extern "C" {
 			_FATALERROR("Loaded in editor, marking as incompatible!\n");
 			return false;
 		}
-
-		switch (a_skse->RuntimeVersion()) {
-		case RUNTIME_VERSION_1_5_73:
-		case RUNTIME_VERSION_1_5_80:
-			break;
-		default:
+		
+#if 0
+		// 
+		if (!a_skse->RuntimeVersion().Compare(SKSE::RUNTIME_1_5_73))
+		if (!a_skse->RuntimeVersion().Compare(SKSE::RUNTIME_1_5_80))
+		if (!a_skse->RuntimeVersion().Compare(SKSE::RUNTIME_1_5_97))
+		{
 			_FATALERROR("Unsupported runtime version %08X!\n", a_skse->RuntimeVersion());
 			return false;
 		}
+#endif
+		
 
 		return true;
 	}
